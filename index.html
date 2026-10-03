@@ -70,6 +70,7 @@
         }
         .card.active {
             border-color: #38bdf8;
+            background-color: #182640;
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
         }
         .card-header {
@@ -185,14 +186,13 @@
                 }
             }
 
-            // Update footer metrics
             document.getElementById('cyclesText').textContent = `Daily Cycles Completed: ${cyclesCompleted}`;
             const activeMins = Math.floor(totalActiveSeconds / 60);
             document.getElementById('activeTimeText').textContent = `Total Active Time: ${activeMins}m`;
         }
 
         function adjustTime(index, deltaMins) {
-            if (isRunning) return; // Don't adjust while running
+            if (isRunning) return;
             let newDur = phases[index].duration + (deltaMins * 60);
             if (newDur >= 60) {
                 phases[index].duration = newDur;
@@ -252,7 +252,7 @@
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
                 gain.gain.setValueAtTime(0.1, ctx.currentTime);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
