@@ -5,23 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Standing Desk Timer</title>
     <style>
+        :root {
+            --bg-color: #0d1322;
+            --card-bg: #131b2e;
+            --card-active-bg: #182640;
+            --border-color: #1e293b;
+            --accent-color: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --button-bg: #1e293b;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #0d1322;
-            color: #f8fafc;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
             height: 100vh;
             margin: 0;
             justify-content: space-between;
+            transition: background-color 0.3s ease;
         }
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem 2rem;
-            background-color: #131b2e;
-            border-bottom: 1px solid #1e293b;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
         }
         h1 { margin: 0; font-size: 1.25rem; font-weight: 600; }
         .controls-top {
@@ -30,21 +42,22 @@
             align-items: center;
         }
         select, button {
-            background-color: #1e293b;
-            color: #f8fafc;
-            border: 1px solid #334155;
+            background-color: var(--button-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
             font-size: 0.875rem;
             cursor: pointer;
         }
+        select:hover, button:hover { background-color: var(--border-color); }
         button.primary {
-            background-color: #0284c7;
-            border-color: #0284c7;
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border-color: var(--accent-color);
             font-weight: 600;
         }
-        button.primary:hover { background-color: #0369a1; }
-        button:hover { background-color: #334155; }
+        button.primary:hover { opacity: 0.9; }
         
         .main-container {
             display: grid;
@@ -58,8 +71,8 @@
             box-sizing: border-box;
         }
         .card {
-            background-color: #131b2e;
-            border: 2px solid #1e293b;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
             border-radius: 0.75rem;
             display: flex;
             flex-direction: column;
@@ -69,17 +82,17 @@
             transition: all 0.3s ease;
         }
         .card.active {
-            border-color: #38bdf8;
-            background-color: #182640;
+            border-color: var(--accent-color);
+            background-color: var(--card-active-bg);
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
         }
         .card-header {
             font-size: 1.1rem;
             font-weight: 700;
             text-align: left;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
-        .card.active .card-header { color: #f8fafc; }
+        .card.active .card-header { color: var(--text-main); }
         .timer-display {
             font-size: 3.5rem;
             font-weight: bold;
@@ -95,18 +108,18 @@
         .card-footer button {
             padding: 0.25rem 0.75rem;
             font-size: 0.75rem;
-            background-color: #1e293b;
+            background-color: var(--button-bg);
         }
-        .time-label { font-size: 0.875rem; color: #94a3b8; margin: 0 0.5rem; }
+        .time-label { font-size: 0.875rem; color: var(--text-muted); margin: 0 0.5rem; }
 
         footer {
             display: flex;
             justify-content: space-between;
             padding: 1rem 2rem;
-            background-color: #131b2e;
-            border-top: 1px solid #1e293b;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
             font-size: 0.875rem;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
     </style>
 </head>
@@ -114,8 +127,17 @@
     <header>
         <h1>Standing Desk Timer</h1>
         <div class="controls-top">
-            <select id="themeSelect">
-                <option>Ocean Blue</option>
+            <select id="themeSelect" onchange="changeTheme()">
+                <option value="Ocean Blue">Ocean Blue</option>
+                <option value="Emerald Green">Emerald Green</option>
+                <option value="Royal Purple">Royal Purple</option>
+                <option value="Sunset Orange">Sunset Orange</option>
+                <option value="Rose Red">Rose Red</option>
+                <option value="Amber Gold">Amber Gold</option>
+                <option value="Cyan Bright">Cyan Bright</option>
+                <option value="Lime Fresh" selected>Lime Fresh</option>
+                <option value="Fuchsia Pulse">Fuchsia Pulse</option>
+                <option value="Slate Minimal">Slate Minimal</option>
             </select>
             <button onclick="previewAudio()">🔊 Preview</button>
             <button id="startBtn" class="primary" onclick="toggleWorkflow()">Start Workflow</button>
@@ -159,6 +181,35 @@
     </footer>
 
     <script>
+        const themes = {
+            "Ocean Blue": { bg: "#0d1322", card: "#131b2e", activeCard: "#182640", border: "#1e293b", accent: "#38bdf8" },
+            "Emerald Green": { bg: "#0d1f12", card: "#132e1a", activeCard: "#193d24", border: "#1e3a23", accent: "#22c55e" },
+            "Royal Purple": { bg: "#180d22", card: "#25132e", activeCard: "#331a3f", border: "#2e1e3a", accent: "#a855f7" },
+            "Sunset Orange": { bg: "#22170d", card: "#2e2213", activeCard: "#3f2f1a", border: "#3a2d1e", accent: "#f97316" },
+            "Rose Red": { bg: "#220d12", card: "#2e131b", activeCard: "#3f1a25", border: "#3a1e26", accent: "#f43f5e" },
+            "Amber Gold": { bg: "#221d0d", card: "#2e2713", activeCard: "#3f361a", border: "#3a341e", accent: "#eab308" },
+            "Cyan Bright": { bg: "#0d1f22", card: "#132b2e", activeCard: "#19383c", border: "#1e353a", accent: "#06b6d4" },
+            "Lime Fresh": { bg: "#17220d", card: "#202e13", activeCard: "#2b3f1a", border: "#273a1e", accent: "#84cc16" },
+            "Fuchsia Pulse": { bg: "#220d1f", card: "#2e132b", activeCard: "#3f1a3a", border: "#3a1e35", accent: "#d946ef" },
+            "Slate Minimal": { bg: "#0f172a", card: "#1e293b", activeCard: "#334155", border: "#334155", accent: "#64748b" }
+        };
+
+        function changeTheme() {
+            const selected = document.getElementById("themeSelect").value;
+            const t = themes[selected];
+            if (!t) return;
+            const root = document.documentElement;
+            root.style.setProperty('--bg-color', t.bg);
+            root.style.setProperty('--card-bg', t.card);
+            root.style.setProperty('--card-active-bg', t.activeCard);
+            root.style.setProperty('--border-color', t.border);
+            root.style.setProperty('--accent-color', t.accent);
+        }
+
+        // Initialize with Lime Fresh theme matching user screenshot
+        document.getElementById("themeSelect").value = "Lime Fresh";
+        changeTheme();
+
         const phases = [
             { name: "Stand", duration: 20 * 60, defaultDur: 20 * 60 },
             { name: "Sit", duration: 8 * 60, defaultDur: 8 * 60 },
@@ -196,6 +247,7 @@
             let newDur = phases[index].duration + (deltaMins * 60);
             if (newDur >= 60) {
                 phases[index].duration = newDur;
+                phases[index].defaultDur = newDur;
                 document.getElementById(`dur-${index}`).textContent = `${newDur / 60} min`;
                 if (index === currentPhase) timeLeft = newDur;
                 updateDisplay();
